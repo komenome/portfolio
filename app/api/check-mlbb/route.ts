@@ -3,7 +3,7 @@ import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   try {
-    const rateLimit = checkRateLimit(request, {
+    const rateLimit = await checkRateLimit(request, {
       maxRequests: 10,
       windowMs: 60 * 1000, // 10 requests per minute
     });

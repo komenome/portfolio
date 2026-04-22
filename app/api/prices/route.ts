@@ -1,28 +1,37 @@
 import { NextResponse } from "next/server";
 import { checkRateLimit } from "@/lib/rate-limit";
+import { PUBG_PRICES } from "@/lib/constants/pubg-prices";
+import type { PriceItem } from "@/data/types";
 
-const GAME_ORDER = ["mlbb-global", "mlbb-mysg", "magic-chess", "pubg-global"];
+const GAME_ORDER = ["mlbb-global", "mlbb-mysg", "magic-chess", "pubg-global"] as const;
 
 const UNAVAILABLE_GAMES = ["mlbb-mysg", "magic-chess"];
 
-const PUBG_PRICES = {
-  gameId: "pubg-global",
-  gameName: "PUBG Mobile",
-  currency: "UC",
-  items: [
-    { amount: "60", bonus: null, price: "3,900 Ks" },
-    { amount: "325", bonus: null, price: "19,500 Ks" },
-    { amount: "660", bonus: null, price: "39,000 Ks" },
-    { amount: "1800", bonus: null, price: "97,500 Ks" },
-    { amount: "3850", bonus: null, price: "195,000 Ks" },
-    { amount: "8100", bonus: null, price: "390,000 Ks" },
-  ],
-  unavailable: false,
-};
+interface MergedGamePrice {
+  gameId: string;
+  gameName: string;
+  currency: string;
+  items: PriceItem[];
+  weeklyPass?: PriceItem[];
+  doubleDiamond?: PriceItem[];
+  unavailable?: boolean;
+}
 
-const FALLBACKS: Record<string, object> = {
-  "mlbb-mysg": { gameId: "mlbb-mysg", gameName: "Mobile Legends (MY/SG)", currency: "Diamonds", items: [], unavailable: true },
-  "magic-chess": { gameId: "magic-chess", gameName: "Magic Chess", currency: "Diamonds", items: [], unavailable: true },
+const FALLBACKS: Record<string, MergedGamePrice> = {
+  "mlbb-mysg": {
+    gameId: "mlbb-mysg",
+    gameName: "Mobile Legends (MY/SG)",
+    currency: "Diamonds",
+    items: [],
+    unavailable: true,
+  },
+  "magic-chess": {
+    gameId: "magic-chess",
+    gameName: "Magic Chess",
+    currency: "Diamonds",
+    items: [],
+    unavailable: true,
+  },
 };
 
 type PBRecord = {
@@ -49,20 +58,20 @@ function safeParse<T>(val: unknown): T | undefined {
   return val as T;
 }
 
-function mapRecord(r: PBRecord) {
+function mapRecord(r: PBRecord): MergedGamePrice {
   return {
     gameId: r.game_id,
     gameName: r.game_name,
     currency: r.currency,
-    items: safeParse(r.items) ?? [],
-    weeklyPass: safeParse(r.weekly_pass),
-    doubleDiamond: safeParse(r.double_diamond),
+    items: safeParse<PriceItem[]>(r.items) ?? [],
+    weeklyPass: safeParse<PriceItem[]>(r.weekly_pass),
+    doubleDiamond: safeParse<PriceItem[]>(r.double_diamond),
   };
 }
 
 export async function GET(request: Request) {
   try {
-    const rateLimit = checkRateLimit(request, {
+    const rateLimit = await checkRateLimit(request, {
       maxRequests: 30,
       windowMs: 60 * 1000, // 30 requests per minute
     });
@@ -88,17 +97,29 @@ export async function GET(request: Request) {
     }
 
     const data = await res.json();
-    const records: ReturnType<typeof mapRecord>[] = (data.items ?? []).map(mapRecord);
+    const records: MergedGamePrice[] = (data.items ?? []).map(mapRecord);
 
-    const sorted = GAME_ORDER.map((id) => {
-      if (id === "pubg-global") return PUBG_PRICES;
+    const sorted: MergedGamePrice[] = GAME_ORDER.map((id) => {
+      if (id === "pubg-global") return PUBG_PRICES as MergedGamePrice;
       const found = records.find((g) => g.gameId === id);
       if (found) return found;
-      return FALLBACKS[id] ?? { gameId: id, gameName: id, currency: "", items: [], unavailable: true };
+      return (
+        FALLBACKS[id] ?? {
+          gameId: id,
+          gameName: id,
+          currency: "",
+          items: [],
+          unavailable: true,
+        }
+      );
     });
 
-    sorted.forEach((g: any) => {
-      if (g.items?.length === 0 && !g.weeklyPass?.length && !g.doubleDiamond?.length) {
+    sorted.forEach((g: MergedGamePrice) => {
+      if (
+        g.items?.length === 0 &&
+        (!g.weeklyPass || g.weeklyPass.length === 0) &&
+        (!g.doubleDiamond || g.doubleDiamond.length === 0)
+      ) {
         g.unavailable = true;
       }
       if (UNAVAILABLE_GAMES.includes(g.gameId)) {
