@@ -29,7 +29,7 @@ export function HeroSection() {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" />
             </svg>
-            Trusted Game Shop Service
+            Trusted Game Top-Up Service
           </div>
 
           <h1 className="font-heading text-5xl sm:text-6xl md:text-8xl font-bold tracking-tight mb-6">
