@@ -51,7 +51,7 @@ export function AboutContent() {
             About BINGO
           </div>
           <h1 className="font-heading text-4xl md:text-5xl font-bold text-white mb-4">
-            Your Trusted <span className="text-[#00e5ff] glow-cyan">Game Top Up</span> Service
+            Your Trusted <span className="text-[#00e5ff] glow-cyan">Game Shop</span> Service
           </h1>
           <p className="text-gray-400 max-w-lg mx-auto leading-relaxed">
             Fast, reliable, and affordable game top-up service for Myanmar gamers.
