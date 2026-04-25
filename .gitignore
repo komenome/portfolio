@@ -39,3 +39,4 @@ cloudflare-env.d.ts
 
 # wrangler dev state
 .wrangler
+.vercel
