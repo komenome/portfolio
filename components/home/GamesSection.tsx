@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
@@ -8,13 +9,9 @@ const games = [
     name: "Mobile Legends",
     desc: "Diamonds, Passes & Bundles",
     icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-        <path d="M2 17l10 5 10-5"/>
-        <path d="M2 12l10 5 10-5"/>
-      </svg>
+      <Image src="/icons/mlbb.png" width={40} height={40} alt="Mobile Legends" />
     ),
-    iconColor: "text-[#00e5ff]",
+    iconColor: "",
     gradient: "from-[#00e5ff]/20 to-[#00e5ff]/0",
     border: "border-[#00e5ff]/10 hover:border-[#00e5ff]/30",
   },
@@ -30,17 +27,9 @@ const games = [
     name: "PUBG Mobile",
     desc: "UC, bundles & skins",
     icon: (
-      <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/>
-        <circle cx="12" cy="12" r="6"/>
-        <circle cx="12" cy="12" r="2"/>
-        <line x1="12" y1="2" x2="12" y2="6"/>
-        <line x1="12" y1="18" x2="12" y2="22"/>
-        <line x1="2" y1="12" x2="6" y2="12"/>
-        <line x1="18" y1="12" x2="22" y2="12"/>
-      </svg>
+      <Image src="/icons/pubg.png" width={40} height={40} alt="PUBG Mobile" />
     ),
-    iconColor: "text-[#ffd700]",
+    iconColor: "",
     gradient: "from-[#ffd700]/20 to-[#ffd700]/0",
     border: "border-[#ffd700]/10 hover:border-[#ffd700]/30",
   },
@@ -77,7 +66,7 @@ export function GamesSection() {
         {games.map((game) => (
           <Link
             key={game.name}
-            href="/checker"
+            href="/catalog"
             className={`glass-card p-8 group relative overflow-hidden border ${game.border}`}
           >
             <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
